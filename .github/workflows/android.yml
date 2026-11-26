@@ -3,6 +3,9 @@ name: Build Release APK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
 
   build:
@@ -57,3 +60,25 @@ jobs:
           app/build/outputs/apk/githubPreview/release/*-signed.apk
         if-no-files-found: error
         retention-days: 20
+
+    # Publishes a GitHub Release the in-app updater (UpdateUtil) reads.
+    # Tag/name = v<versionName> from buildSrc/src/main/kotlin/Version.kt; bump it before
+    # each release, otherwise this step fails because the tag already exists.
+    - name: Publish GitHub release
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        set -euo pipefail
+        shopt -s nullglob
+        apks=(app/build/outputs/apk/generic/release/*-signed.apk app/build/outputs/apk/githubPreview/release/*-signed.apk)
+        [ ${#apks[@]} -gt 0 ] || { echo "No signed APKs found"; exit 1; }
+        version=$(basename "${apks[0]}" | sed -E 's/^Seal-(.+)-(generic|githubPreview)-.*$/\1/')
+        tag="v$version"
+        prerelease=""
+        [[ "$version" == *-* ]] && prerelease="--prerelease"
+        gh release create "$tag" "${apks[@]}" \
+          --repo "$GITHUB_REPOSITORY" \
+          --target "$GITHUB_SHA" \
+          --title "$tag" \
+          --generate-notes \
+          $prerelease
