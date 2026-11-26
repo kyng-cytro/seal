@@ -166,7 +166,6 @@ object UpdateUtil {
                 release.assets
                     ?.find {
                         val name = it.name ?: return@find false
-                        // Fork releases ship both flavors; pick the APK matching this build.
                         name.contains(preferredArch) &&
                             name.contains(BuildConfig.FLAVOR, ignoreCase = true)
                     }

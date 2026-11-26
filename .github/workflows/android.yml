@@ -61,9 +61,6 @@ jobs:
         if-no-files-found: error
         retention-days: 20
 
-    # Publishes a GitHub Release the in-app updater (UpdateUtil) reads.
-    # Tag/name = v<versionName> from buildSrc/src/main/kotlin/Version.kt; bump it before
-    # each release, otherwise this step fails because the tag already exists.
     - name: Publish GitHub release
       env:
         GH_TOKEN: ${{ github.token }}
