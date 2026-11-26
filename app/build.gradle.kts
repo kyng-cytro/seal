@@ -47,8 +47,7 @@ android {
         applicationId = "com.cytro.seal"
         minSdk = 24
         targetSdk = 35
-        versionCode = 200_000_150
-        check(versionCode == currentVersionCode)
+        versionCode = currentVersionCode
 
         versionName = baseVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
