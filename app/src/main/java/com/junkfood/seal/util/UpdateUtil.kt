@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import com.junkfood.seal.App
 import com.junkfood.seal.App.Companion.context
+import com.junkfood.seal.BuildConfig
 import com.junkfood.seal.R
 import com.junkfood.seal.util.FileUtil.getFileProvider
 import com.junkfood.seal.util.PreferenceUtil.getInt
@@ -31,8 +32,8 @@ import okhttp3.ResponseBody
 
 object UpdateUtil {
 
-    private const val OWNER = "JunkFood02"
-    private const val REPO = "Seal"
+    private const val OWNER = "kyng-cytro"
+    private const val REPO = "seal"
     private const val ARM64 = "arm64-v8a"
     private const val ARM32 = "armeabi-v7a"
     private const val X86 = "x86"
@@ -164,7 +165,10 @@ object UpdateUtil {
             val targetUrl =
                 release.assets
                     ?.find {
-                        return@find it.name?.contains(preferredArch) ?: false
+                        val name = it.name ?: return@find false
+                        // Fork releases ship both flavors; pick the APK matching this build.
+                        name.contains(preferredArch) &&
+                            name.contains(BuildConfig.FLAVOR, ignoreCase = true)
                     }
                     ?.browserDownloadUrl ?: return@withContext emptyFlow()
             val request = Request.Builder().url(targetUrl).build()
